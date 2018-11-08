@@ -48,24 +48,52 @@ public class DAWFinalProject
 
 class ProgramFrame extends JFrame
 {
-    private static final int OUR_DEFAULT_FRAME_WIDTH = 450;
-    private static final int OUR_DEFAULT_FRAME_HEIGHT = 300;
+    private static final int OUR_DEFAULT_FRAME_WIDTH = 600;
+    private static final int OUR_DEFAULT_FRAME_HEIGHT = 600;
     private static final int OUR_DEFAULT_COMPONENT_FIELD_AND_AREA_WIDTH = 25;
 
-    private JPanel myProgramPanel;
-    private JPanel programPanel()
+    private JPanel northProgramPanel;
+    private JPanel centerProgramPanel;
+    private JPanel southProgramPanel;
+
+    private JPanel getNorthProgramPanel()
     {
 
-        return myProgramPanel;
+        return northProgramPanel;
 
-        }
+    }
 
-    private void setProgramPanel(JPanel other)
+    private JPanel getCenterProgramPanel()
     {
 
-        myProgramPanel = other;
+	    return centerProgramPanel;
 
-        }
+    }
+    
+    private JPanel getSouthProgramPanel()
+    {
+	return southProgramPanel;
+    }
+
+    private void setNorthProgramPanel(JPanel other)
+    {
+
+        northProgramPanel = other;
+
+    }
+
+    private void setCenterProgramPanel(JPanel other)
+    {
+
+        centerProgramPanel = other;
+
+    }
+
+    private void setSouthProgramPanel(JPanel other)
+    {
+	southProgramPanel = other;
+    }
+
     private Rectangle2D myCurrentSquare;        
 
     
@@ -81,25 +109,27 @@ class ProgramFrame extends JFrame
         // Create panel to hold all components
         //
 
-           setProgramPanel(new JPanel());
+        setNorthProgramPanel(new JPanel());
+	setCenterProgramPanel(new JPanel());
+	setSouthProgramPanel(new JPanel());
 
         
 
 
   
-            JButton SaveButton = new JButton("Save");
-            JButton LoadButton = new JButton("Load");
-            JButton ClearButton = new JButton("Clear");
-            JButton CopyButton = new JButton("Copy");
-            JButton AppendButton = new JButton("Append");
-            JButton MergeButton = new JButton("Merge");
+        JButton SaveButton = new JButton("Save");
+        JButton LoadButton = new JButton("Load");
+        JButton ClearButton = new JButton("Clear");
+        JButton CopyButton = new JButton("Copy");
+        JButton AppendButton = new JButton("Append");
+        JButton MergeButton = new JButton("Merge");
             
             
-            JButton PlayButton =new JButton("Play");
-            JButton PauseButton=new JButton("pause");
-            JButton BacktrackButon=new JButton("Backtrack");
-            JButton FastfrowardButton=new JButton("Fast Forward");
-            JButton NexttrackButon=new JButton("Next Track");
+        JButton PlayButton =new JButton("Play");
+        JButton PauseButton=new JButton("Pause");
+        JButton BacktrackButon=new JButton("Backtrack");
+        JButton FastfrowardButton=new JButton("Fast Forward");
+        JButton NexttrackButon=new JButton("Next Track");
 
 
 
@@ -107,67 +137,66 @@ class ProgramFrame extends JFrame
         // Add buttons to panel
         //
 
-            programPanel().add(SaveButton);
-            programPanel().add(LoadButton);
-            programPanel().add(ClearButton);
-            programPanel().add(CopyButton);
-            programPanel().add(AppendButton);
-            programPanel().add(MergeButton);
+        getNorthProgramPanel().add(SaveButton);
+        getNorthProgramPanel().add(LoadButton);
+        getNorthProgramPanel().add(ClearButton);
+        getNorthProgramPanel().add(CopyButton);
+        getNorthProgramPanel().add(AppendButton);
+        getNorthProgramPanel().add(MergeButton);
+
         //
         // Add panel to frame
         //
 
-            add(programPanel());
+        add(getNorthProgramPanel(), "North");
 
         //
         //
+        getCenterProgramPanel().add(PlayButton);
+        getCenterProgramPanel().add(PauseButton);
+        getCenterProgramPanel().add(BacktrackButon);
+        getCenterProgramPanel().add(FastfrowardButton);
+        getCenterProgramPanel().add(NexttrackButon);
+
         JButton NormalizeBox = new JButton("Normalize");
         JButton ClipBox = new JButton("Clip");
         JButton ReverseBox = new JButton("Reverse");
         JButton ResampleBox = new JButton("Resample");
-        programPanel().add(NormalizeBox);
-        programPanel().setVisible(true);
-        programPanel().add(ClipBox);
-        programPanel().setVisible(true);
-        programPanel().add(ReverseBox);
-        programPanel().setVisible(true);
-        programPanel().add(ResampleBox);
-        programPanel().setVisible(true);
-    
-        
-        
+        getCenterProgramPanel().add(NormalizeBox);
+        getCenterProgramPanel().add(ClipBox);
+        getCenterProgramPanel().add(ReverseBox);
+        getCenterProgramPanel().add(ResampleBox);
+
+	add(getCenterProgramPanel(), "Center");
      
-        programPanel().add(PlayButton);
-        programPanel().add(PauseButton);
-        programPanel().add(BacktrackButon);
-        programPanel().add(FastfrowardButton);
-        programPanel().add(NexttrackButon);
         
-        JSlider volumeSlider = new JSlider(JSlider.VERTICAL, 0 /* min */, 100 /* max */, 10 /* default */);
-        volumeSlider.setMajorTickSpacing(10);
-        volumeSlider.setPaintTicks(true);
-        programPanel().add(volumeSlider);
+        JSlider amplitudeSlider = new JSlider(JSlider.VERTICAL, 0 /* min */, 100 /* max */, 10 /* default */);
+        amplitudeSlider.setMajorTickSpacing(10);
+        amplitudeSlider.setPaintTicks(true);
+        getSouthProgramPanel().add(amplitudeSlider);
         
         
         
         
 
-//Progress bar for each track: Track1 and Track2..
+	//Progress bar for each track: Track1 and Track2..
         JProgressBar progressBarTrack1 = new JProgressBar(0);
         JProgressBar progressBarTrack2 = new JProgressBar(0);
         
         
         JLabel TracksLabel = new JLabel("Track1- ");
-        programPanel().add(TracksLabel);
+        getSouthProgramPanel().add(TracksLabel);
         progressBarTrack1.setValue(0);
         progressBarTrack1.setStringPainted(true);
-        programPanel().add(progressBarTrack1);
+        getSouthProgramPanel().add(progressBarTrack1);
         
         JLabel TracksLabe2 = new JLabel("Track2- ");
-        programPanel().add(TracksLabe2);
+        getSouthProgramPanel().add(TracksLabe2);
         progressBarTrack2.setValue(0);
         progressBarTrack2.setStringPainted(true);
-        programPanel().add(progressBarTrack2);
+        getSouthProgramPanel().add(progressBarTrack2);
+
+	add(getSouthProgramPanel(), "South");
     
    }
 }
