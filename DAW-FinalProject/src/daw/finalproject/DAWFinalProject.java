@@ -37,14 +37,14 @@ public class DAWFinalProject
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     frame.setVisible(true);
 
-                    }
-
                 }
-            );
 
-        }
+            }
+        );
 
     }
+
+}
 
 class ProgramFrame extends JFrame
 {
@@ -55,6 +55,9 @@ class ProgramFrame extends JFrame
     private JPanel northProgramPanel;
     private JPanel centerProgramPanel;
     private JPanel southProgramPanel;
+
+    private Playback playback;
+
 
     private JPanel getNorthProgramPanel()
     {
@@ -117,19 +120,18 @@ class ProgramFrame extends JFrame
 
 
   
-        JButton SaveButton = new JButton("Save");
-        JButton LoadButton = new JButton("Load");
-        JButton ClearButton = new JButton("Clear");
-        JButton CopyButton = new JButton("Copy");
-        JButton AppendButton = new JButton("Append");
-        JButton MergeButton = new JButton("Merge");
-            
-            
-        JButton PlayButton =new JButton("Play");
-        JButton PauseButton=new JButton("Pause");
-        JButton BacktrackButon=new JButton("Backtrack");
-        JButton FastfrowardButton=new JButton("Fast Forward");
-        JButton NexttrackButon=new JButton("Next Track");
+        JButton saveButton = new JButton("Save");
+        JButton loadButton = new JButton("Load");
+        JButton clearButton = new JButton("Clear");
+        JButton copyButton = new JButton("Copy");
+        JButton appendButton = new JButton("Append");
+        JButton mergeButton = new JButton("Merge");
+                 
+        JButton playButton = new JButton("Play");
+        JButton pauseButton = new JButton("Pause");
+        JButton backTrackButton = new JButton("Backtrack");
+        JButton fastForwardButton = new JButton("Fast Forward");
+        JButton nextTrackButton = new JButton("Next Track");
 
 
 
@@ -137,12 +139,12 @@ class ProgramFrame extends JFrame
         // Add buttons to panel
         //
 
-        getNorthProgramPanel().add(SaveButton);
-        getNorthProgramPanel().add(LoadButton);
-        getNorthProgramPanel().add(ClearButton);
-        getNorthProgramPanel().add(CopyButton);
-        getNorthProgramPanel().add(AppendButton);
-        getNorthProgramPanel().add(MergeButton);
+        getNorthProgramPanel().add(saveButton);
+        getNorthProgramPanel().add(loadButton);
+        getNorthProgramPanel().add(clearButton);
+        getNorthProgramPanel().add(copyButton);
+        getNorthProgramPanel().add(appendButton);
+        getNorthProgramPanel().add(mergeButton);
 
         //
         // Add panel to frame
@@ -152,20 +154,21 @@ class ProgramFrame extends JFrame
 
         //
         //
-        getCenterProgramPanel().add(PlayButton);
-        getCenterProgramPanel().add(PauseButton);
-        getCenterProgramPanel().add(BacktrackButon);
-        getCenterProgramPanel().add(FastfrowardButton);
-        getCenterProgramPanel().add(NexttrackButon);
+        getCenterProgramPanel().add(playButton);
+        getCenterProgramPanel().add(pauseButton);
+        getCenterProgramPanel().add(backTrackButton);
+        getCenterProgramPanel().add(fastForwardButton);
+        getCenterProgramPanel().add(nextTrackButton);
 
-        JButton NormalizeBox = new JButton("Normalize");
-        JButton ClipBox = new JButton("Clip");
-        JButton ReverseBox = new JButton("Reverse");
-        JButton ResampleBox = new JButton("Resample");
-        getCenterProgramPanel().add(NormalizeBox);
-        getCenterProgramPanel().add(ClipBox);
-        getCenterProgramPanel().add(ReverseBox);
-        getCenterProgramPanel().add(ResampleBox);
+        JButton normalizeButton = new JButton("Normalize");
+        JButton clipButton = new JButton("Clip");
+        JButton reverseButton = new JButton("Reverse");
+        JButton resampleButton = new JButton("Resample");
+
+        getCenterProgramPanel().add(normalizeButton);
+        getCenterProgramPanel().add(clipButton);
+        getCenterProgramPanel().add(reverseButton);
+        getCenterProgramPanel().add(resampleButton);
 
 	add(getCenterProgramPanel(), "Center");
      
@@ -197,6 +200,16 @@ class ProgramFrame extends JFrame
         getSouthProgramPanel().add(progressBarTrack2);
 
 	add(getSouthProgramPanel(), "South");
+
+
+	// Actually do stuff
+	
+	// wav file courtesy of https://freewavesamples.com
+	playback = new Playback("C4.wav");
+	playButton.addActionListener(playback.getPlayListener());
+	pauseButton.addActionListener(playback.getPauseListener());
+	
+	
     
    }
 }
