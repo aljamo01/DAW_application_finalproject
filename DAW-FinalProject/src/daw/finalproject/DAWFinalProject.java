@@ -129,7 +129,7 @@ class ProgramFrame extends JFrame
                  
         JButton playButton = new JButton("Play");
         JButton pauseButton = new JButton("Pause");
-        JButton backTrackButton = new JButton("Backtrack");
+        JButton backtrackButton = new JButton("Backtrack");
         JButton fastForwardButton = new JButton("Fast Forward");
         JButton nextTrackButton = new JButton("Next Track");
 
@@ -156,7 +156,7 @@ class ProgramFrame extends JFrame
         //
         getCenterProgramPanel().add(playButton);
         getCenterProgramPanel().add(pauseButton);
-        getCenterProgramPanel().add(backTrackButton);
+        getCenterProgramPanel().add(backtrackButton);
         getCenterProgramPanel().add(fastForwardButton);
         getCenterProgramPanel().add(nextTrackButton);
 
@@ -208,6 +208,10 @@ class ProgramFrame extends JFrame
 	playback = new Playback("C4.wav");
 	playButton.addActionListener(playback.getPlayListener());
 	pauseButton.addActionListener(playback.getPauseListener());
+	backtrackButton.addActionListener(playback.getBacktrackListener());
+	fastForwardButton.addActionListener(
+	    playback.getFastForwardListener()
+	);
 	
 	
     

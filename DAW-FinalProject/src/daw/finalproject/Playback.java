@@ -2,7 +2,6 @@ package daw.finalproject;
 
 import java.io.File; 
 import java.io.IOException; 
-
 import java.awt.event.*;
 
 import javax.sound.sampled.AudioInputStream; 
@@ -14,25 +13,53 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Playback { 
 
-    public class PlayListener implements ActionListener {
+    private class PlayListener implements ActionListener {
 	public void actionPerformed(ActionEvent event){
+	    if (getClip().getFrameLength() == getClip().getFramePosition())
+		getClip().setFramePosition(0);	
 	    getClip().start();
 	}
 
     }
 
-    public class PauseListener implements ActionListener {
+    private class PauseListener implements ActionListener {
 	public void actionPerformed(ActionEvent event){
-	    if (getClip().isRunning())
-		getClip().stop();
+	    getClip().stop();
 	}
     }
+
+    private class BacktrackListener implements ActionListener {
+	public void actionPerformed(ActionEvent event){
+	    final long x = getClip().getMicrosecondPosition()
+		- JUMP_MICROSEC;
+	    final long y = 0L;
+	    getClip().setMicrosecondPosition(
+		x > y ? x : y
+	    );
+	}
+    }
+
+    private class FastForwardListener implements ActionListener {
+	public void actionPerformed(ActionEvent event){
+	    final long x = getClip().getMicrosecondPosition() 
+		+ JUMP_MICROSEC;
+	    final long y = getClip().getMicrosecondLength();
+	    getClip().setMicrosecondPosition(
+		x < y ? x : y
+	    );
+	}
+    }
+
+    private static final long JUMP_MICROSEC = 5000000L;
 
     private File audioFile;
     private AudioInputStream audioInputStream;
     private Clip clip;
+
     private PlayListener playListener;
     private PauseListener pauseListener;
+    private BacktrackListener backtrackListener;
+    private FastForwardListener fastForwardListener;
 
 
     public PlayListener getPlayListener(){
@@ -41,6 +68,14 @@ public class Playback {
 
     public PauseListener getPauseListener(){
 	return pauseListener;
+    }
+
+    public BacktrackListener getBacktrackListener(){
+	return backtrackListener;
+    }
+
+    public FastForwardListener getFastForwardListener(){
+	return fastForwardListener;
     }
 
     private Clip getClip() {
@@ -66,6 +101,8 @@ public class Playback {
 
 	playListener = new PlayListener();
 	pauseListener = new PauseListener();
+	backtrackListener = new BacktrackListener();
+	fastForwardListener = new FastForwardListener();
         
 
     }
