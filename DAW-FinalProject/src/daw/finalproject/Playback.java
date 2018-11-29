@@ -81,6 +81,24 @@ public class Playback {
     private Clip getClip() {
 	return clip;
     }
+
+    public void changeFile(File myFile) {
+	getClip().stop();
+	try {
+	    audioFile = myFile; 
+	    audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+      
+	    clip = AudioSystem.getClip();
+	    // open the clip 
+	    clip.open(audioInputStream);
+	}
+	// TODO: Non-lazy exception handling.
+	catch(Exception ex) { 
+	    System.out.println("Error with playing sound."); 
+            ex.printStackTrace(); 
+	} 
+    }
+
   
     // TODO: constructors for other types, e.g. File, AudioInputStream
     public Playback(String audioFilePath) {
@@ -106,4 +124,29 @@ public class Playback {
         
 
     }
+
+    public Playback(File myFile) {
+       
+	try {
+	    audioFile = myFile; 
+	    audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+      
+	    clip = AudioSystem.getClip();
+	    // open the clip 
+	    clip.open(audioInputStream);
+	}
+	// TODO: Non-lazy exception handling.
+	catch(Exception ex) { 
+	    System.out.println("Error with playing sound."); 
+            ex.printStackTrace(); 
+	} 
+
+	playListener = new PlayListener();
+	pauseListener = new PauseListener();
+	backtrackListener = new BacktrackListener();
+	fastForwardListener = new FastForwardListener();
+        
+
+    }
+
 }

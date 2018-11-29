@@ -5,6 +5,8 @@
  */
 package daw.finalproject;
 
+import java.io.*;
+
 import java.awt.EventQueue;
 import java.awt.geom.Rectangle2D;
 import javax.swing.JButton;
@@ -18,6 +20,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.awt.geom.*;
 import java.util.Scanner;
+import javax.swing.filechooser.*;
 
 
 public class DAWFinalProject
@@ -48,6 +51,23 @@ public class DAWFinalProject
 
 class ProgramFrame extends JFrame
 {
+    private class ButtonListener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+	    trackChooser.show((Component) event.getSource(), 0, 0);
+	    currentAction = event.getSource();
+	}
+    }
+
+    private class MenuItemListener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+	    int trackNum = event.getSource() == track1MenuItem ? 1 : 2;
+	    if (currentAction == loadButton)
+		load(trackNum);
+	    // TODO: add more.
+	}
+    }
+
+
     private static final int OUR_DEFAULT_FRAME_WIDTH = 600;
     private static final int OUR_DEFAULT_FRAME_HEIGHT = 600;
     private static final int OUR_DEFAULT_COMPONENT_FIELD_AND_AREA_WIDTH = 25;
@@ -56,7 +76,36 @@ class ProgramFrame extends JFrame
     private JPanel centerProgramPanel;
     private JPanel southProgramPanel;
 
-    private Playback playback;
+    private JPopupMenu trackChooser;
+    private JMenuItem track1MenuItem;
+    private JMenuItem track2MenuItem;
+    private Object currentAction;
+
+    private JFileChooser fileChooser;
+    private File track1File;
+    private File track2File;
+    
+    private Playback playback1;
+    private Playback playback2;
+    private int currentTrack = 1;
+
+    private JButton saveButton;
+    private JButton loadButton;
+    private JButton clearButton;
+    private JButton copyButton;
+    private JButton appendButton;
+    private JButton mergeButton;
+	     
+    private JButton playButton;
+    private JButton pauseButton;
+    private JButton backtrackButton;
+    private JButton fastForwardButton;
+    private JButton nextTrackButton;
+
+    private JButton normalizeButton;
+    private JButton clipButton;
+    private JButton reverseButton;
+    private JButton resampleButton;
 
 
     private JPanel getNorthProgramPanel()
@@ -69,7 +118,7 @@ class ProgramFrame extends JFrame
     private JPanel getCenterProgramPanel()
     {
 
-	    return centerProgramPanel;
+	return centerProgramPanel;
 
     }
     
@@ -97,7 +146,63 @@ class ProgramFrame extends JFrame
 	southProgramPanel = other;
     }
 
-    private Rectangle2D myCurrentSquare;        
+    private void load(int trackNum) {
+	int approveVal = fileChooser.showOpenDialog(loadButton);
+	if (approveVal == JFileChooser.APPROVE_OPTION) {
+	    if (trackNum == 1) {
+		track1File = fileChooser.getSelectedFile();
+		if (playback1 == null)
+		    playback1 = new Playback(track1File);
+		else
+		    playback1.changeFile(track1File);
+	    } else {
+		track2File = fileChooser.getSelectedFile();
+		if (playback2 == null)
+		    playback2 = new Playback(track2File);
+		else
+		    playback2.changeFile(track2File);
+	    }
+	}
+	//if (trackNum == currentTrack)
+	    //changePlayback(trackNum);
+    }
+
+    private void changePlayback(int trackNum) {
+	currentTrack = trackNum;
+	Playback playback = trackNum == 1 ? playback1 : playback2;
+	// Change the listeners in the most painful way imaginable.
+	// XXX Don't know if this works yet, so no promises.
+	if (playButton.getActionListeners().length != 0)
+	    playButton.getActionListeners()[0] =
+		playback.getPlayListener();
+	else
+	    playButton.addActionListener(
+		playback.getPlayListener()
+	    );
+	if (pauseButton.getActionListeners().length != 0)
+	    pauseButton.getActionListeners()[0] =
+		playback.getPauseListener();
+	else
+	    pauseButton.addActionListener(
+		playback.getPauseListener()
+	    );
+	if (backtrackButton.getActionListeners().length != 0)
+	    backtrackButton.getActionListeners()[0] =
+		playback.getBacktrackListener();
+	else
+	    backtrackButton.addActionListener(
+		playback.getBacktrackListener()
+	    );
+	if (fastForwardButton.getActionListeners().length != 0)
+	    fastForwardButton.getActionListeners()[0] =
+		playback.getFastForwardListener();
+	else
+	    fastForwardButton.addActionListener(
+		playback.getFastForwardListener()
+	    );
+    }
+
+
 
     
     public ProgramFrame()
@@ -120,18 +225,18 @@ class ProgramFrame extends JFrame
 
 
   
-        JButton saveButton = new JButton("Save");
-        JButton loadButton = new JButton("Load");
-        JButton clearButton = new JButton("Clear");
-        JButton copyButton = new JButton("Copy");
-        JButton appendButton = new JButton("Append");
-        JButton mergeButton = new JButton("Merge");
+        saveButton = new JButton("Save");
+        loadButton = new JButton("Load");
+        clearButton = new JButton("Clear");
+        copyButton = new JButton("Copy");
+        appendButton = new JButton("Append");
+        mergeButton = new JButton("Merge");
                  
-        JButton playButton = new JButton("Play");
-        JButton pauseButton = new JButton("Pause");
-        JButton backtrackButton = new JButton("Backtrack");
-        JButton fastForwardButton = new JButton("Fast Forward");
-        JButton nextTrackButton = new JButton("Next Track");
+        playButton = new JButton("Play");
+        pauseButton = new JButton("Pause");
+        backtrackButton = new JButton("Backtrack");
+        fastForwardButton = new JButton("Fast Forward");
+        nextTrackButton = new JButton("Next Track");
 
 
 
@@ -160,10 +265,10 @@ class ProgramFrame extends JFrame
         getCenterProgramPanel().add(fastForwardButton);
         getCenterProgramPanel().add(nextTrackButton);
 
-        JButton normalizeButton = new JButton("Normalize");
-        JButton clipButton = new JButton("Clip");
-        JButton reverseButton = new JButton("Reverse");
-        JButton resampleButton = new JButton("Resample");
+        normalizeButton = new JButton("Normalize");
+        clipButton = new JButton("Clip");
+        reverseButton = new JButton("Reverse");
+        resampleButton = new JButton("Resample");
 
         getCenterProgramPanel().add(normalizeButton);
         getCenterProgramPanel().add(clipButton);
@@ -205,13 +310,28 @@ class ProgramFrame extends JFrame
 	// Actually do stuff
 	
 	// wav file courtesy of https://freewavesamples.com
-	playback = new Playback("C4.wav");
-	playButton.addActionListener(playback.getPlayListener());
-	pauseButton.addActionListener(playback.getPauseListener());
-	backtrackButton.addActionListener(playback.getBacktrackListener());
+	playback1 = new Playback("C4.wav");
+	playButton.addActionListener(playback1.getPlayListener());
+	pauseButton.addActionListener(playback1.getPauseListener());
+	backtrackButton.addActionListener(playback1.getBacktrackListener());
 	fastForwardButton.addActionListener(
-	    playback.getFastForwardListener()
+	    playback1.getFastForwardListener()
 	);
+
+	fileChooser = new JFileChooser();
+
+	trackChooser = new JPopupMenu();
+	track1MenuItem = new JMenuItem("Track 1");
+	track2MenuItem = new JMenuItem("Track 2");
+	trackChooser.add(track1MenuItem);
+	trackChooser.add(track2MenuItem);
+
+	MenuItemListener menuItemListener = new MenuItemListener();
+	track1MenuItem.addActionListener(menuItemListener);
+	track2MenuItem.addActionListener(menuItemListener);
+
+	ButtonListener buttonListener = new ButtonListener();
+	loadButton.addActionListener(buttonListener);
 	
 	
     
