@@ -63,6 +63,11 @@ class ProgramFrame extends JFrame
 	    int trackNum = event.getSource() == track1MenuItem ? 1 : 2;
 	    if (currentAction == loadButton)
 		load(trackNum);
+	    if (currentAction == clearButton)
+		clear(trackNum);
+
+	    if (currentAction == nextTrackButton)
+		changePlayback(trackNum);
 	    // TODO: add more.
 	}
     }
@@ -162,45 +167,66 @@ class ProgramFrame extends JFrame
 		else
 		    playback2.changeFile(track2File);
 	    }
+	    if (trackNum == currentTrack)
+		changePlayback(trackNum);
 	}
 	//if (trackNum == currentTrack)
 	    //changePlayback(trackNum);
     }
 
+    private void clear(int trackNum) {
+	if (currentTrack == trackNum)
+	    removePlaybackListeners(trackNum == 1 ? playback1 : playback2);
+
+	if (trackNum == 1)
+	    playback1 = null;
+	else
+	    playback2 = null;
+    }
+
     private void changePlayback(int trackNum) {
-	currentTrack = trackNum;
-	Playback playback = trackNum == 1 ? playback1 : playback2;
+	Playback newPlayback = trackNum == 1 ? playback1 : playback2;
+	Playback oldPlayback = currentTrack == 1 ? playback1 : playback2;
 	// Change the listeners in the most painful way imaginable.
 	// XXX Don't know if this works yet, so no promises.
-	if (playButton.getActionListeners().length != 0)
-	    playButton.getActionListeners()[0] =
-		playback.getPlayListener();
-	else
+	if (trackNum != currentTrack)
+	    removePlaybackListeners(oldPlayback);
+
+	if (newPlayback != null) {
 	    playButton.addActionListener(
-		playback.getPlayListener()
+		newPlayback.getPlayListener()
 	    );
-	if (pauseButton.getActionListeners().length != 0)
-	    pauseButton.getActionListeners()[0] =
-		playback.getPauseListener();
-	else
 	    pauseButton.addActionListener(
-		playback.getPauseListener()
+		newPlayback.getPauseListener()
 	    );
-	if (backtrackButton.getActionListeners().length != 0)
-	    backtrackButton.getActionListeners()[0] =
-		playback.getBacktrackListener();
-	else
-	    backtrackButton.addActionListener(
-		playback.getBacktrackListener()
-	    );
-	if (fastForwardButton.getActionListeners().length != 0)
-	    fastForwardButton.getActionListeners()[0] =
-		playback.getFastForwardListener();
-	else
 	    fastForwardButton.addActionListener(
-		playback.getFastForwardListener()
+		newPlayback.getFastForwardListener()
 	    );
+	    backtrackButton.addActionListener(
+		newPlayback.getBacktrackListener()
+	    );
+	}
+	currentTrack = trackNum;
     }
+
+    // Helper function to remove action listeners regarding a playback.
+    private void removePlaybackListeners(Playback oldPlayback) {
+	if (oldPlayback != null) {
+	    playButton.removeActionListener(
+		oldPlayback.getPlayListener()
+	    );
+	    pauseButton.removeActionListener(
+		oldPlayback.getPlayListener()
+	    );
+	    fastForwardButton.removeActionListener(
+		oldPlayback.getFastForwardListener()
+	    );
+	    backtrackButton.removeActionListener(
+		oldPlayback.getBacktrackListener()
+	    );
+	}
+    }
+
 
 
 
@@ -309,14 +335,7 @@ class ProgramFrame extends JFrame
 
 	// Actually do stuff
 	
-	// wav file courtesy of https://freewavesamples.com
-	playback1 = new Playback("C4.wav");
-	playButton.addActionListener(playback1.getPlayListener());
-	pauseButton.addActionListener(playback1.getPauseListener());
-	backtrackButton.addActionListener(playback1.getBacktrackListener());
-	fastForwardButton.addActionListener(
-	    playback1.getFastForwardListener()
-	);
+	// wav files courtesy of https://freewavesamples.com
 
 	fileChooser = new JFileChooser();
 
@@ -332,6 +351,9 @@ class ProgramFrame extends JFrame
 
 	ButtonListener buttonListener = new ButtonListener();
 	loadButton.addActionListener(buttonListener);
+	clearButton.addActionListener(buttonListener);
+
+	nextTrackButton.addActionListener(buttonListener);
 	
 	
     
