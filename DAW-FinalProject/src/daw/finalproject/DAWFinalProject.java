@@ -231,8 +231,10 @@ class ProgramFrame extends JFrame
 	else
 	    currentProgressBar = progressBarTrack2;
 
-	oldPlayback.removeProgressListener(progressListener);
-	newPlayback.addProgressListener(progressListener);
+	if (oldPlayback != null)
+	    oldPlayback.removeProgressListener(progressListener);
+	if (newPlayback != null)
+	    newPlayback.addProgressListener(progressListener);
 
 
 	currentTrack = trackNum;
