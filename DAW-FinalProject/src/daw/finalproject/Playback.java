@@ -82,6 +82,15 @@ public class Playback {
 	return clip;
     }
 
+    public void addProgressListener(ProgramFrame.ProgressListener progressListener) {
+	getClip().addLineListener(progressListener);
+    }
+
+    public void removeProgressListener(ProgramFrame.ProgressListener progressListener) {
+	getClip().removeLineListener(progressListener);
+    }
+
+
     public void changeFile(File myFile) {
 	getClip().stop();
 	try {

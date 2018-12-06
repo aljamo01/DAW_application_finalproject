@@ -21,6 +21,7 @@ import javax.swing.*;
 import java.awt.geom.*;
 import java.util.Scanner;
 import javax.swing.filechooser.*;
+import javax.sound.sampled.*;
 
 
 public class DAWFinalProject
@@ -72,6 +73,23 @@ class ProgramFrame extends JFrame
 	}
     }
 
+    public class ProgressListener implements LineListener {
+	public void update(LineEvent event) {
+	    if (event.getType() == LineEvent.Type.START) {
+		Clip clip = (Clip) event.getLine();
+		while (clip.isRunning()) {
+		    currentProgressBar.setValue(
+			(clip.getFramePosition() * 100) 
+			/ clip.getFrameLength()
+		    );
+		}
+	    }
+	}
+    }
+
+
+
+
 
     private static final int OUR_DEFAULT_FRAME_WIDTH = 600;
     private static final int OUR_DEFAULT_FRAME_HEIGHT = 600;
@@ -111,6 +129,12 @@ class ProgramFrame extends JFrame
     private JButton clipButton;
     private JButton reverseButton;
     private JButton resampleButton;
+
+    private JProgressBar progressBarTrack1;
+    private JProgressBar progressBarTrack2;
+    private JProgressBar currentProgressBar;
+
+    private ProgressListener progressListener;
 
 
     private JPanel getNorthProgramPanel()
@@ -170,8 +194,6 @@ class ProgramFrame extends JFrame
 	    if (trackNum == currentTrack)
 		changePlayback(trackNum);
 	}
-	//if (trackNum == currentTrack)
-	    //changePlayback(trackNum);
     }
 
     private void clear(int trackNum) {
@@ -187,8 +209,6 @@ class ProgramFrame extends JFrame
     private void changePlayback(int trackNum) {
 	Playback newPlayback = trackNum == 1 ? playback1 : playback2;
 	Playback oldPlayback = currentTrack == 1 ? playback1 : playback2;
-	// Change the listeners in the most painful way imaginable.
-	// XXX Don't know if this works yet, so no promises.
 	if (trackNum != currentTrack)
 	    removePlaybackListeners(oldPlayback);
 
@@ -206,6 +226,15 @@ class ProgramFrame extends JFrame
 		newPlayback.getBacktrackListener()
 	    );
 	}
+	if (trackNum == 1)
+	    currentProgressBar = progressBarTrack1;
+	else
+	    currentProgressBar = progressBarTrack2;
+
+	oldPlayback.removeProgressListener(progressListener);
+	newPlayback.addProgressListener(progressListener);
+
+
 	currentTrack = trackNum;
     }
 
@@ -314,8 +343,17 @@ class ProgramFrame extends JFrame
         
 
 	//Progress bar for each track: Track1 and Track2..
-        JProgressBar progressBarTrack1 = new JProgressBar(0);
-        JProgressBar progressBarTrack2 = new JProgressBar(0);
+        progressBarTrack1 = new JProgressBar(0);
+	progressBarTrack1.setMinimum(0);
+	progressBarTrack1.setMaximum(100);
+
+        progressBarTrack2 = new JProgressBar(0);
+	progressBarTrack2.setMinimum(0);
+	progressBarTrack2.setMaximum(100);
+
+
+	progressListener = new ProgressListener();
+	currentProgressBar = progressBarTrack1;
         
         
         JLabel TracksLabel = new JLabel("Track1- ");
