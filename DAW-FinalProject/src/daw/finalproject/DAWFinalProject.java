@@ -75,15 +75,20 @@ class ProgramFrame extends JFrame
 
     public class ProgressListener implements LineListener {
 	public void update(LineEvent event) {
-	    if (event.getType() == LineEvent.Type.START) {
-		Clip clip = (Clip) event.getLine();
+	    Clip clip = (Clip) event.getLine();
+	    if (event.getType() == LineEvent.Type.START)
 		while (clip.isRunning()) {
 		    currentProgressBar.setValue(
 			(clip.getFramePosition() * 100) 
 			/ clip.getFrameLength()
 		    );
 		}
-	    }
+	    else if (event.getType() == LineEvent.Type.STOP)
+		currentProgressBar.setValue(
+		    (clip.getFramePosition() * 100) / clip.getFrameLength()
+		);
+	    else if (event.getType() == LineEvent.Type.CLOSE)
+		currentProgressBar.setValue(0);
 	}
     }
 
@@ -200,10 +205,14 @@ class ProgramFrame extends JFrame
 	if (currentTrack == trackNum)
 	    removePlaybackListeners(trackNum == 1 ? playback1 : playback2);
 
-	if (trackNum == 1)
+	if (trackNum == 1) {
 	    playback1 = null;
-	else
+	    progressBarTrack1.setValue(0);
+	}
+	else {
 	    playback2 = null;
+	    progressBarTrack2.setValue(0);
+	}
     }
 
     private void changePlayback(int trackNum) {

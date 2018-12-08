@@ -30,23 +30,35 @@ public class Playback {
 
     private class BacktrackListener implements ActionListener {
 	public void actionPerformed(ActionEvent event){
-	    final long x = getClip().getMicrosecondPosition()
+	    final boolean wasRunning = getClip().isRunning();
+	    final long position = getClip().getMicrosecondPosition()
 		- JUMP_MICROSEC;
-	    final long y = 0L;
+	    final long minPosition = 0L;
 	    getClip().setMicrosecondPosition(
-		x > y ? x : y
+		position > minPosition ? position : minPosition
 	    );
+	    // most painful workaround to send updates to line listeners
+	    if (!wasRunning) {
+		getClip().start();
+		getClip().stop();
+	    }
 	}
     }
 
     private class FastForwardListener implements ActionListener {
 	public void actionPerformed(ActionEvent event){
-	    final long x = getClip().getMicrosecondPosition() 
+	    final boolean wasRunning = getClip().isRunning();
+	    final long position = getClip().getMicrosecondPosition() 
 		+ JUMP_MICROSEC;
-	    final long y = getClip().getMicrosecondLength();
+	    final long maxPosition = getClip().getMicrosecondLength();
 	    getClip().setMicrosecondPosition(
-		x < y ? x : y
+		position < maxPosition ? position : maxPosition
 	    );
+	    // most painful workaround to send updates to line listeners
+	    if (!wasRunning) {
+		getClip().start();
+		getClip().stop();
+	    }
 	}
     }
 
@@ -92,7 +104,7 @@ public class Playback {
 
 
     public void changeFile(File myFile) {
-	getClip().stop();
+	getClip().close();
 	try {
 	    audioFile = myFile; 
 	    audioInputStream = AudioSystem.getAudioInputStream(audioFile);
