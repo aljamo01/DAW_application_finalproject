@@ -1,4 +1,3 @@
-
 package daw.finalproject;
 
 import java.io.*;
@@ -12,7 +11,7 @@ import daw.finalproject.WavEditor;
 
 class ProgramFrame extends JFrame
 {
-	int trackNum;
+    int trackNum;
     private class ButtonListener implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 	    currentAction = event.getSource();
@@ -47,25 +46,26 @@ class ProgramFrame extends JFrame
 	    if (currentAction == nextTrackButton)
 		changePlayback(trackNum);
 		if (currentAction == reverseButton) {
-+		try {
-+		    AudioInputStream audioInputStream =
-+			WavEditor.reverse(
-+			    AudioSystem.getAudioInputStream(
-+				playback.getFile()
-+				));
-+		    AudioSystem.write(
-+			audioInputStream,
-+			AudioFileFormat.Type.WAVE,
-+			tempSave);
-+		    playback.changeFile(tempSave);
-+		}
-+		// do not care about exceptions.
-+		catch(Exception e) {}
-+		if (trackNum == currentTrack)
-+		    changePlayback(trackNum);
-+	    }
+		try {
+		    AudioInputStream audioInputStream =
+			WavEditor.reverse(
+			    AudioSystem.getAudioInputStream(
+				playback.getFile()
+				));
+		    AudioSystem.write(
+			audioInputStream,
+			AudioFileFormat.Type.WAVE,
+			tempSave);
+		    playback.changeFile(tempSave);
+		}
+		// do not care about exceptions.
+		catch(Exception e) {}
+		if (trackNum == currentTrack)
+		    changePlayback(trackNum);
+	    }
 		if (currentAction == resampleButton)
         sampleRateChooser.show((Component) resampleButton, 0, 0);
+    }
     }
 	
 	private class MenuSampleListener implements ActionListener {
@@ -433,7 +433,7 @@ class ProgramFrame extends JFrame
 	MenuSampleListener menusampleListener = new MenuSampleListener();
 	sample1MenuItem.addActionListener(menusampleListener);
 	sample2MenuItem.addActionListener(menusampleListener);
-    sample3MenuItem.addActionListener(menusampleListener);
+        sample3MenuItem.addActionListener(menusampleListener);
 
 	ButtonListener buttonListener = new ButtonListener();
 	loadButton.addActionListener(buttonListener);
@@ -457,4 +457,6 @@ class ProgramFrame extends JFrame
 	    playback2 = new Playback(save2);
 	
    }
-}
+    }
+
+
