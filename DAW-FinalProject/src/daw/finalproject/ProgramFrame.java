@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 import javax.sound.sampled.*;
 
+import daw.finalproject.WavEditor;
 
 class ProgramFrame extends JFrame
 {
@@ -27,6 +28,7 @@ class ProgramFrame extends JFrame
 		if (currentPlayback != null)
 		    currentPlayback.fastForward();
 	    } else
+		// Pass event handling to MenuItemListener
 		trackChooser.show((Component) event.getSource(), 0, 0);
 	}
     }
@@ -34,6 +36,8 @@ class ProgramFrame extends JFrame
     private class MenuItemListener implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 	    int trackNum = event.getSource() == track1MenuItem ? 1 : 2;
+	    Playback playback = (trackNum == 1 ? playback1 : playback2);
+	    File tempSave = (trackNum == 1 ? save1 : save2);
 	    if (currentAction == loadButton)
 		load(trackNum);
 	    if (currentAction == clearButton)
@@ -41,6 +45,25 @@ class ProgramFrame extends JFrame
 
 	    if (currentAction == nextTrackButton)
 		changePlayback(trackNum);
+	    if (currentAction == resampleButton) {
+		try {
+		    AudioInputStream audioInputStream =
+			WavEditor.resample(
+			    11025.0f, 
+			    AudioSystem.getAudioInputStream(
+				playback.getFile()));
+		    AudioSystem.write(
+			audioInputStream, 
+			AudioFileFormat.Type.WAVE, 
+			tempSave);
+		}
+		catch(Exception ex) {
+		    System.out.println("idk what");
+		}
+		playback.changeFile(tempSave);
+		if (trackNum == currentTrack)
+		    changePlayback(trackNum);
+	    }
 	    // TODO: add more.
 	}
     }
@@ -81,6 +104,9 @@ class ProgramFrame extends JFrame
     private JFileChooser fileChooser;
     private File track1File;
     private File track2File;
+
+    private File save1;
+    private File save2;
     
     private Playback playback1;
     private Playback playback2;
@@ -159,12 +185,26 @@ class ProgramFrame extends JFrame
 		    playback1 = new Playback(track1File);
 		else
 		    playback1.changeFile(track1File);
+		try {
+		    AudioSystem.write(
+			AudioSystem.getAudioInputStream(track1File),
+			AudioFileFormat.Type.WAVE, 
+			save1);
+		}
+		catch (Exception ex) {}
 	    } else {
 		track2File = fileChooser.getSelectedFile();
 		if (playback2 == null)
 		    playback2 = new Playback(track2File);
 		else
 		    playback2.changeFile(track2File);
+		try {
+		    AudioSystem.write(
+			AudioSystem.getAudioInputStream(track2File),
+			AudioFileFormat.Type.WAVE, 
+			save2);
+		}
+		catch (Exception ex) {}
 	    }
 	    if (trackNum == currentTrack)
 		changePlayback(trackNum);
@@ -178,10 +218,12 @@ class ProgramFrame extends JFrame
 	if (trackNum == 1) {
 	    playback1 = null;
 	    progressBarTrack1.setValue(0);
+	    save1.delete();
 	}
 	else {
 	    playback2 = null;
 	    progressBarTrack2.setValue(0);
+	    save2.delete();
 	}
     }
 
@@ -343,6 +385,16 @@ class ProgramFrame extends JFrame
 	fastForwardButton.addActionListener(buttonListener);
 	backtrackButton.addActionListener(buttonListener);
 	nextTrackButton.addActionListener(buttonListener);
+
+	resampleButton.addActionListener(buttonListener);
+
+	save1 = new File("." + File.separator + "save1.wav");
+	save2 = new File("." + File.separator + "save2.wav");
+
+	if (save1.exists())
+	    playback1 = new Playback(save1);
+	if (save2.exists())
+	    playback2 = new Playback(save2);
 	
    }
 }

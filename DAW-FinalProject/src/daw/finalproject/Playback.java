@@ -74,6 +74,10 @@ public class Playback {
 	getClip().removeLineListener(lineListener);
     }
 
+    public File getFile() {
+	return audioFile;
+    }
+
     public void changeFile(File myFile) {
 	getClip().close();
 	try {
