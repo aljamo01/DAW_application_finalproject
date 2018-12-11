@@ -46,7 +46,7 @@ class ProgramFrame extends JFrame
 	    if (currentAction == nextTrackButton)
 		changePlayback(trackNum);
 	    if (currentAction == reverseButton) {
-		try {
+		if (playback != null){ try {
 		    AudioInputStream audioInputStream =
 			WavEditor.reverse(
 			    AudioSystem.getAudioInputStream(
@@ -62,10 +62,11 @@ class ProgramFrame extends JFrame
 		catch(Exception e) {}
 		if (trackNum == currentTrack)
 		    changePlayback(trackNum);
+		}
 	    }
 
 	    if (currentAction == resampleButton) {
-		try {
+		if (playback != null){ try {
 		    AudioInputStream audioInputStream =
 			WavEditor.resample(
 			    11025.0f, 
@@ -82,6 +83,49 @@ class ProgramFrame extends JFrame
 		playback.changeFile(tempSave);
 		if (trackNum == currentTrack)
 		    changePlayback(trackNum);
+		}
+	    }
+
+	    if (currentAction == normalizeButton) {
+		if (playback != null){ try {
+		    AudioInputStream audioInputStream =
+			WavEditor.normalize(
+			    AudioSystem.getAudioInputStream(
+				playback.getFile()
+				));
+		    AudioSystem.write(
+			audioInputStream,
+			AudioFileFormat.Type.WAVE,
+			tempSave);
+		    playback.changeFile(tempSave);
+		}
+		// do not care about exceptions.
+		catch(Exception e) {}
+		if (trackNum == currentTrack)
+		    changePlayback(trackNum);
+		}
+	    }
+
+	    if (currentAction == mergeButton) {
+		if (playback1 != null && playback2 != null){ try {
+		    AudioInputStream audioInputStream =
+			WavEditor.merge(
+			    AudioSystem.getAudioInputStream(
+				playback1.getFile()
+				),
+			    AudioSystem.getAudioInputStream(
+				playback2.getFile()));
+		    AudioSystem.write(
+			audioInputStream,
+			AudioFileFormat.Type.WAVE,
+			tempSave);
+		    playback.changeFile(tempSave);
+		}
+		// do not care about exceptions.
+		catch(Exception e) {}
+		if (trackNum == currentTrack)
+		    changePlayback(trackNum);
+		}
 	    }
 	    // TODO: add more.
 	}
@@ -407,6 +451,8 @@ class ProgramFrame extends JFrame
 
 	reverseButton.addActionListener(buttonListener);
 	resampleButton.addActionListener(buttonListener);
+	normalizeButton.addActionListener(buttonListener);
+	mergeButton.addActionListener(buttonListener);
 
 	save1 = new File("." + File.separator + "save1.wav");
 	save2 = new File("." + File.separator + "save2.wav");
