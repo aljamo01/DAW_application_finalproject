@@ -4,63 +4,11 @@ import java.io.File;
 import java.io.IOException; 
 import java.awt.event.*;
 
-import javax.sound.sampled.AudioInputStream; 
-import javax.sound.sampled.AudioSystem; 
-import javax.sound.sampled.Clip; 
-import javax.sound.sampled.LineUnavailableException; 
-import javax.sound.sampled.UnsupportedAudioFileException; 
+import javax.sound.sampled.*;
 
 
 public class Playback { 
 
-    private class PlayListener implements ActionListener {
-	public void actionPerformed(ActionEvent event){
-	    if (getClip().getFrameLength() == getClip().getFramePosition())
-		getClip().setFramePosition(0);	
-	    getClip().start();
-	}
-
-    }
-
-    private class PauseListener implements ActionListener {
-	public void actionPerformed(ActionEvent event){
-	    getClip().stop();
-	}
-    }
-
-    private class BacktrackListener implements ActionListener {
-	public void actionPerformed(ActionEvent event){
-	    final boolean wasRunning = getClip().isRunning();
-	    final long position = getClip().getMicrosecondPosition()
-		- JUMP_MICROSEC;
-	    final long minPosition = 0L;
-	    getClip().setMicrosecondPosition(
-		position > minPosition ? position : minPosition
-	    );
-	    // most painful workaround to send updates to line listeners
-	    if (!wasRunning) {
-		getClip().start();
-		getClip().stop();
-	    }
-	}
-    }
-
-    private class FastForwardListener implements ActionListener {
-	public void actionPerformed(ActionEvent event){
-	    final boolean wasRunning = getClip().isRunning();
-	    final long position = getClip().getMicrosecondPosition() 
-		+ JUMP_MICROSEC;
-	    final long maxPosition = getClip().getMicrosecondLength();
-	    getClip().setMicrosecondPosition(
-		position < maxPosition ? position : maxPosition
-	    );
-	    // most painful workaround to send updates to line listeners
-	    if (!wasRunning) {
-		getClip().start();
-		getClip().stop();
-	    }
-	}
-    }
 
     private static final long JUMP_MICROSEC = 5000000L;
 
@@ -68,40 +16,63 @@ public class Playback {
     private AudioInputStream audioInputStream;
     private Clip clip;
 
-    private PlayListener playListener;
-    private PauseListener pauseListener;
-    private BacktrackListener backtrackListener;
-    private FastForwardListener fastForwardListener;
-
-
-    public PlayListener getPlayListener(){
-	return playListener;
-    }
-
-    public PauseListener getPauseListener(){
-	return pauseListener;
-    }
-
-    public BacktrackListener getBacktrackListener(){
-	return backtrackListener;
-    }
-
-    public FastForwardListener getFastForwardListener(){
-	return fastForwardListener;
-    }
 
     private Clip getClip() {
 	return clip;
     }
 
-    public void addProgressListener(ProgramFrame.ProgressListener progressListener) {
-	getClip().addLineListener(progressListener);
+    //
+    // Public methods
+    // Preconditions: clip must be initialized.
+    //
+
+    public void play() {
+	if (getClip().getFrameLength() == getClip().getFramePosition())
+	    getClip().setFramePosition(0);	
+	getClip().start();
     }
 
-    public void removeProgressListener(ProgramFrame.ProgressListener progressListener) {
-	getClip().removeLineListener(progressListener);
+    public void pause() {
+	getClip().stop();
     }
 
+    public void backtrack() {
+	final boolean wasRunning = getClip().isRunning();
+	final long position = getClip().getMicrosecondPosition()
+	    - JUMP_MICROSEC;
+	final long minPosition = 0L;
+	getClip().setMicrosecondPosition(
+	    position > minPosition ? position : minPosition
+	);
+	// most painful workaround to send updates to line listeners
+	if (!wasRunning) {
+	    getClip().start();
+	    getClip().stop();
+	}
+    }
+
+    public void fastForward() {
+	final boolean wasRunning = getClip().isRunning();
+	final long position = getClip().getMicrosecondPosition() 
+	    + JUMP_MICROSEC;
+	final long maxPosition = getClip().getMicrosecondLength();
+	getClip().setMicrosecondPosition(
+	    position < maxPosition ? position : maxPosition
+	);
+	// most painful workaround to send updates to line listeners
+	if (!wasRunning) {
+	    getClip().start();
+	    getClip().stop();
+	}
+    }
+
+    public void addLineListener(LineListener lineListener) {
+	getClip().addLineListener(lineListener);
+    }
+
+    public void removeLineListener(LineListener lineListener) {
+	getClip().removeLineListener(lineListener);
+    }
 
     public void changeFile(File myFile) {
 	getClip().close();
@@ -137,11 +108,6 @@ public class Playback {
 	    System.out.println("Error with playing sound."); 
             ex.printStackTrace(); 
 	} 
-
-	playListener = new PlayListener();
-	pauseListener = new PauseListener();
-	backtrackListener = new BacktrackListener();
-	fastForwardListener = new FastForwardListener();
         
 
     }
@@ -161,11 +127,6 @@ public class Playback {
 	    System.out.println("Error with playing sound."); 
             ex.printStackTrace(); 
 	} 
-
-	playListener = new PlayListener();
-	pauseListener = new PauseListener();
-	backtrackListener = new BacktrackListener();
-	fastForwardListener = new FastForwardListener();
         
 
     }
