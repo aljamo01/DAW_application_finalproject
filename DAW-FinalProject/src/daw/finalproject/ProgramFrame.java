@@ -12,6 +12,7 @@ import daw.finalproject.WavEditor;
 
 class ProgramFrame extends JFrame
 {
+	int trackNum;
     private class ButtonListener implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 	    currentAction = event.getSource();
@@ -45,30 +46,31 @@ class ProgramFrame extends JFrame
 
 	    if (currentAction == nextTrackButton)
 		changePlayback(trackNum);
-	    if (currentAction == reverseButton) {
-		try {
-		    AudioInputStream audioInputStream =
-			WavEditor.reverse(
-			    AudioSystem.getAudioInputStream(
-				playback.getFile()
-				));
-		    AudioSystem.write(
-			audioInputStream,
-			AudioFileFormat.Type.WAVE,
-			tempSave);
-		    playback.changeFile(tempSave);
-		}
-		// do not care about exceptions.
-		catch(Exception e) {}
-		if (trackNum == currentTrack)
-		    changePlayback(trackNum);
-	    }
-
-	    if (currentAction == resampleButton) {
+		if (currentAction == resampleButton)
+        sampleRateChooser.show((Component) resampleButton, 0, 0);
+    }
+	
+	private class MenuSampleListener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+            
+            Playback playback = (trackNum == 1 ? playback1 : playback2);
+	    File tempSave = (trackNum == 1 ? save1 : save2);
+            
+	    float sampleRateValue;
+            if (event.getSource() == sample1MenuItem )
+                sampleRateValue = 11025f;
+            else if (event.getSource() == sample2MenuItem )
+                sampleRateValue = 22050f;
+            else if (event.getSource() == sample3MenuItem )
+                sampleRateValue = 44100f;
+            else
+                sampleRateValue = 11025f;
+            
+            if (currentAction == resampleButton) {
 		try {
 		    AudioInputStream audioInputStream =
 			WavEditor.resample(
-			    11025.0f, 
+			    sampleRateValue, 
 			    AudioSystem.getAudioInputStream(
 				playback.getFile()));
 		    AudioSystem.write(
@@ -78,14 +80,14 @@ class ProgramFrame extends JFrame
 		}
 		catch(Exception ex) {
 		    System.out.println("idk what");
+                    ex.printStackTrace();
 		}
 		playback.changeFile(tempSave);
 		if (trackNum == currentTrack)
-		    changePlayback(trackNum);
+		    changePlayback(trackNum);       
 	    }
-	    // TODO: add more.
-	}
-    }
+}
+ }
 
     public class ProgressListener implements LineListener {
 	public void update(LineEvent event) {
@@ -119,6 +121,11 @@ class ProgramFrame extends JFrame
     private JMenuItem track1MenuItem;
     private JMenuItem track2MenuItem;
     private Object currentAction;
+	
+	private JPopupMenu sampleRateChooser;
+    private JMenuItem sample1MenuItem;
+    private JMenuItem sample2MenuItem;
+    private JMenuItem sample3MenuItem;
 
     private JFileChooser fileChooser;
     private File track1File;
@@ -278,8 +285,8 @@ class ProgramFrame extends JFrame
         //
 
         setNorthProgramPanel(new JPanel());
-	setCenterProgramPanel(new JPanel());
-	setSouthProgramPanel(new JPanel());
+		setCenterProgramPanel(new JPanel());
+		setSouthProgramPanel(new JPanel());
 
           
 	//
@@ -386,6 +393,16 @@ class ProgramFrame extends JFrame
 	track2MenuItem = new JMenuItem("Track 2");
 	trackChooser.add(track1MenuItem);
 	trackChooser.add(track2MenuItem);
+	
+	
+    sampleRateChooser = new JPopupMenu();
+	sample1MenuItem = new JMenuItem("11025 s/s");
+	sample2MenuItem = new JMenuItem("22050 s/s");
+    sample3MenuItem = new JMenuItem("44100 s/s");
+	sampleRateChooser.add(sample1MenuItem);
+	sampleRateChooser.add(sample2MenuItem);
+	sampleRateChooser.add(sample3MenuItem);
+        
 
 	//
 	// Set up listeners.
@@ -394,6 +411,11 @@ class ProgramFrame extends JFrame
 	MenuItemListener menuItemListener = new MenuItemListener();
 	track1MenuItem.addActionListener(menuItemListener);
 	track2MenuItem.addActionListener(menuItemListener);
+	
+	MenuSampleListener menusampleListener = new MenuSampleListener();
+	sample1MenuItem.addActionListener(menusampleListener);
+	sample2MenuItem.addActionListener(menusampleListener);
+    sample3MenuItem.addActionListener(menusampleListener);
 
 	ButtonListener buttonListener = new ButtonListener();
 	loadButton.addActionListener(buttonListener);
