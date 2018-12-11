@@ -45,6 +45,25 @@ class ProgramFrame extends JFrame
 
 	    if (currentAction == nextTrackButton)
 		changePlayback(trackNum);
+	    if (currentAction == reverseButton) {
+		try {
+		    AudioInputStream audioInputStream =
+			WavEditor.reverse(
+			    AudioSystem.getAudioInputStream(
+				playback.getFile()
+				));
+		    AudioSystem.write(
+			audioInputStream,
+			AudioFileFormat.Type.WAVE,
+			tempSave);
+		    playback.changeFile(tempSave);
+		}
+		// do not care about exceptions.
+		catch(Exception e) {}
+		if (trackNum == currentTrack)
+		    changePlayback(trackNum);
+	    }
+
 	    if (currentAction == resampleButton) {
 		try {
 		    AudioInputStream audioInputStream =
@@ -386,6 +405,7 @@ class ProgramFrame extends JFrame
 	backtrackButton.addActionListener(buttonListener);
 	nextTrackButton.addActionListener(buttonListener);
 
+	reverseButton.addActionListener(buttonListener);
 	resampleButton.addActionListener(buttonListener);
 
 	save1 = new File("." + File.separator + "save1.wav");
