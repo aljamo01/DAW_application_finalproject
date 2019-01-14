@@ -1,1 +1,1 @@
-This digital audio workstations(DAW) application was done as a final project for Computer Science 252 at Luther College Fall 2018 instructed by Proffessor Alan Zaring. It was conducted as a group project in collaboration with two other students Alex Hyjek and Hans Larson.
+This digital audio workstation (DAW) application was done as a final project for Computer Science 252 at Luther College Fall 2018 instructed by Professor Alan Zaring. It was conducted as a group project in collaboration with two other students Alex Hyjek and Hans Larson.
